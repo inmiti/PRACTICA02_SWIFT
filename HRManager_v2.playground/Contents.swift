@@ -87,24 +87,15 @@ class HotelReservationManager {
     
     //Método para obtener todas las reservas actuales:
     func AllResevations () -> [Reservation] {
+        
         for reservation in reservationList {
+            var namesClientsList: Array<String> = []
+
             for indice in reservation.clientslist.indices {
-                print( "lista de clientes: ", reservation.clientslist[indice].name)
+                var nameOfClient = reservation.clientslist[indice].name
+                namesClientsList.append(nameOfClient)
             }
-            //var clientReservationList = reservation.clientslist
-            //var namesClients: Array<Int> = []
-            //print(clientReservationList)
-            
-            /*
-            for client in reservation.clientslist {
-                //namesClients.append(clientes.name)
-                //append(clientes.name)
-                //print("Long Lista: \(clientReservationList[client].name)")
-                print("Clientes:", clientReservationList)
-            }
-            
-            
-            print("Nº de reserva:", reservation.id, "Clientes: ", reservation.clientslist[0].name)*/
+            print("Número de reserva: ", reservation.id,  "; Clientes: ", namesClientsList )
         }
         return reservationList
     }
@@ -112,15 +103,18 @@ class HotelReservationManager {
     
 }
 
+// EJEMPLOS CLIENTES:
 let Antonio = Client(name: "Antonio", age: 56, heigh: 1.60)
 let Ascension = Client(name: "Ascension", age: 51, heigh: 1.62)
 
 let Tomas = Client(name: "Tomás", age: 33, heigh: 1.82)
 let Inma = Client(name: "Inma", age: 32, heigh: 1.60)
 
-
-
+// EJEMPLOS RESERVA:
 let reserva1 = try? HotelReservationManager().addNewReservation(clientslistNew: [Antonio,Ascension], daysInHotelNew: 5, breakfastNew: false)
 let reserva2 = try HotelReservationManager().addNewReservation(clientslistNew: [Tomas, Inma], daysInHotelNew: 5, breakfastNew: true)
 
+// EJEMPLO MÉTODO ALLRESERVATIONS:
 let allReservations = HotelReservationManager().AllResevations()
+
+
