@@ -67,7 +67,7 @@ class HotelReservationManager {
         let newReservation = Reservation(id: newId, hotelName: hotelName, clientslist: clientslistNew, daysInHotel: daysInHotelNew, price: priceNew, breakfast: breakfastNew)
         
         reservationList.append(newReservation)
-        print("Se ha realizado la reserva nº \(newReservation.id)")
+        print("Se ha realizado la reserva nº \(newReservation.id) para \(clientslistNew.count) clientes y \(daysInHotelNew) días, por un importe total de \(priceNew) € en el \(hotelName).")
         
         return newReservation
     }
@@ -81,6 +81,7 @@ class HotelReservationManager {
             } else {
                 ReservationError.notReserved
                 print("La reserva no existe")
+                // buscar otra opcion porque sale repetido en cada reserva.
             }
         }
     }
@@ -95,7 +96,7 @@ class HotelReservationManager {
                 var nameOfClient = reservation.clientslist[indice].name
                 namesClientsList.append(nameOfClient)
             }
-            print("Número de reserva: ", reservation.id,  "; Clientes: ", namesClientsList )
+            print("Número de reserva: ", reservation.id,  "; Clientes: ", namesClientsList, "; Precio: ", reservation.price, " €" )
         }
         return reservationList
     }
@@ -110,11 +111,41 @@ let Ascension = Client(name: "Ascension", age: 51, heigh: 1.62)
 let Tomas = Client(name: "Tomás", age: 33, heigh: 1.82)
 let Inma = Client(name: "Inma", age: 32, heigh: 1.60)
 
+let Rosa =  Client(name: "Rosa", age: 28, heigh: 1.58)
+let Elena = Client(name: "Elena", age: 27, heigh: 1.65)
+
 // EJEMPLOS RESERVA:
 let reserva1 = try? HotelReservationManager().addNewReservation(clientslistNew: [Antonio,Ascension], daysInHotelNew: 5, breakfastNew: false)
 let reserva2 = try HotelReservationManager().addNewReservation(clientslistNew: [Tomas, Inma], daysInHotelNew: 5, breakfastNew: true)
 
-// EJEMPLO MÉTODO ALLRESERVATIONS:
+// EJEMPLO ERRORES RESERVA:
+
+// Error id igual no puedo comprobar porque siempre suma y no da la opcion de meter reserva con id.
+
+// Error crear reserva con igual cliente, lanza error "ReservationError.reserved":
+let reserva3 = try? HotelReservationManager().addNewReservation(clientslistNew: [Rosa, Elena, Antonio], daysInHotelNew: 3, breakfastNew: false)
+print(reserva3 ?? ReservationError.self)
+
+let reserva4 = try? HotelReservationManager().addNewReservation(clientslistNew: [Rosa, Elena], daysInHotelNew: 3, breakfastNew: false)
+print(reserva4 ?? ReservationError.self)
+
+
+// EJEMPLO VER RESERVAS CON EL MÉTODO ALLRESERVATIONS:
 let allReservations = HotelReservationManager().AllResevations()
 
+//print(allReservations)
 
+// CANCELANDO LA RESERVA 4: Ha de dar error
+
+let cancelacion1 = try HotelReservationManager().cancelReservation(idRemove: 4)
+// Hay que modificar porque sale repetido el mensaje de que no existe, el print pero no arroja error. Hay que quitar la repetición.
+
+// Cancelando la RESERVA 2:
+
+let cancelacion2 = HotelReservationManager().cancelReservation(idRemove: 2)
+// despues de borrar vuelve a iterar y da no existe... corregir
+
+// Comprobando que la reserva 2 se ha borrado:
+
+let todasReservas = HotelReservationManager().AllResevations()
+//Me ha eliminado la ultima reserva, no la reserva 2. Hay que corregir. Se debe a que remove(at) elimina el elemento del índice dado, no del id...
