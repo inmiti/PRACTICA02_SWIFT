@@ -15,10 +15,21 @@ struct Reservation: Equatable {
     let breakfast: Bool
 }
 
-enum ReservationError: Error {
+enum ReservationError: LocalizedError {
     case sameId
     case reserved
     case notReserved
+    
+    var errorDescription: String? {
+        switch self {
+        case .sameId:
+            return "Se encontró reserva con el mismo Id"
+        case .reserved:
+            return "El cliente ya tiene una reserva"
+        case .notReserved:
+            return "No se ha encontrado la reserva"
+        }
+    }
 }
 
 private var reservationList: [Reservation] = []
@@ -76,7 +87,7 @@ class HotelReservationManager {
     func cancelReservation(idRemove: Int) throws {
         for reservation in reservationList {
             if idRemove == reservation.id {
-                reservationList.remove(at: idRemove)
+                reservationList.remove(at: reservationList.lastIndex(of: reservation)!)
                 print("La reserva nº \(idRemove) se ha cancelado")
             } else {
                 ReservationError.notReserved
@@ -87,6 +98,7 @@ class HotelReservationManager {
     }
     
     //Método para obtener todas las reservas actuales:
+    // OJO VER CustomStringConvertible
     func AllResevations () -> [Reservation] {
         
         for reservation in reservationList {
@@ -129,7 +141,7 @@ print(reserva3 ?? ReservationError.self)
 let reserva4 = try? HotelReservationManager().addNewReservation(clientslistNew: [Rosa, Elena], daysInHotelNew: 3, breakfastNew: false)
 print(reserva4 ?? ReservationError.self)
 
-
+/*
 // EJEMPLO VER RESERVAS CON EL MÉTODO ALLRESERVATIONS:
 let allReservations = HotelReservationManager().AllResevations()
 
@@ -149,3 +161,4 @@ let cancelacion2 = HotelReservationManager().cancelReservation(idRemove: 2)
 
 let todasReservas = HotelReservationManager().AllResevations()
 //Me ha eliminado la ultima reserva, no la reserva 2. Hay que corregir. Se debe a que remove(at) elimina el elemento del índice dado, no del id...
+*/
