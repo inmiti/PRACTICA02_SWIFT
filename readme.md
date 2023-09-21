@@ -5,5 +5,6 @@
 Se desarrolla un sistema para gestionar las reservas de hotel, inspirado 
 en la serie de Goku.
 
+Descargar el playground y ejecutar. 
 
 
