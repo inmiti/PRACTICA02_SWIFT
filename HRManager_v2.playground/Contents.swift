@@ -85,9 +85,7 @@ class HotelReservationManager {
         print("La reserva nº \(idRemove) se ha cancelado.")
       }
 
-    
     //Método para obtener todas las reservas actuales:
-    // OJO VER CustomStringConvertible
     func AllResevations () -> [Reservation] {
         print("* TODAS LAS RESERVAS: ")
         
@@ -108,8 +106,6 @@ class HotelReservationManager {
         
         return reservationList
     }
-    
-    
 }
 
 // Clientes:
@@ -186,7 +182,7 @@ func testReservationPrice() {
     let clients = [Goku, Pikolo]
     let clients2 = [Vegeta, Bulma]
     let hotelManager = HotelReservationManager()
-    // Dos reservas iguales a excepto el nombre de los clientes para comprobar que el precio es el mismo
+    // Dos reservas iguales excepto el nombre de los clientes, para comprobar que el precio es el mismo
     do {
         let reserva1 = try hotelManager.addNewReservation(clientslistNew: clients, daysInHotelNew: 5, breakfastNew: false)
         let reserva2 = try hotelManager.addNewReservation(clientslistNew: clients2, daysInHotelNew: 5, breakfastNew: false)
@@ -194,7 +190,7 @@ func testReservationPrice() {
         print("El precio de la reserva 1 es \(reserva1.price) siendo igual al precio de la reserva 2 que es \(reserva2.price)." )
     } catch {
         assertionFailure("No se espera ningún error")
-    }  
+    }
 }
 
 print("----Test Add Reservation ----")
