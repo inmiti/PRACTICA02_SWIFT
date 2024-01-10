@@ -45,8 +45,7 @@ class HotelReservationManager {
     
     // Método para añadir reservas:
     func addNewReservation(clientslistNew: [Client], daysInHotelNew: Int, breakfastNew: Bool) throws -> Reservation {
-        
-        var newId = (reservationList.last?.id ?? 0) + 1
+        let newId = (reservationList.last?.id ?? 0) + 1
         
         // Verificar que no se duplica el identificador de reservas, si se repite salta error.
         for reservation in reservationList {
@@ -55,9 +54,7 @@ class HotelReservationManager {
             }
         }
         
-        
         // Verificar que no se duplica un cliente si ya tiene hecha una reserva:
-        
         for newClient in clientslistNew {
             if reservationList.contains(where: { $0.clientslist.contains(where: { $0.name == newClient.name }) }) {
                 throw ReservationError.reserved
@@ -74,7 +71,6 @@ class HotelReservationManager {
         let newReservation = Reservation(id: newId, hotelName: hotelName, clientslist: clientslistNew, daysInHotel: daysInHotelNew, price: priceNew, breakfast: breakfastNew)
         
         reservationList.append(newReservation)
-
         print("Se ha realizado la reserva nº \(newReservation.id) para \(clientslistNew.count) clientes y \(daysInHotelNew) días, por un importe total de \(priceNew) € en el \(hotelName).")
         
         return newReservation
@@ -86,83 +82,124 @@ class HotelReservationManager {
             throw ReservationError.notReserved
           }
         reservationList.remove(at: deleteReservation)
-        print("La reserva nº \(idRemove) se ha cancelado")
+        print("La reserva nº \(idRemove) se ha cancelado.")
       }
 
     
     //Método para obtener todas las reservas actuales:
     // OJO VER CustomStringConvertible
     func AllResevations () -> [Reservation] {
+        print("* TODAS LAS RESERVAS: ")
         
-        for reservation in reservationList {
-            var namesClientsList: Array<String> = []
-
-            for indice in reservation.clientslist.indices {
-                var nameOfClient = reservation.clientslist[indice].name
-                namesClientsList.append(nameOfClient)
+        if !reservationList.isEmpty {
+            for reservation in reservationList {
+                var namesClientsList: Array<String> = []
+                
+                for indice in reservation.clientslist.indices {
+                    var nameOfClient = reservation.clientslist[indice].name
+                    namesClientsList.append(nameOfClient)
+                }
+                print("Nº: ", reservation.id,  "; Clientes: ", namesClientsList, "; Precio: ", reservation.price, " €." )
             }
-            print("Número de reserva: ", reservation.id,  "; Clientes: ", namesClientsList, "; Precio: ", reservation.price, " €" )
         }
+            else {
+                print("No hay reservas.")
+            }
+        
         return reservationList
     }
     
     
 }
 
-// EJEMPLOS CLIENTES:
-let Antonio = Client(name: "Antonio", age: 56, heigh: 1.60)
-let Ascension = Client(name: "Ascension", age: 51, heigh: 1.62)
-let Tomas = Client(name: "Tomás", age: 33, heigh: 1.82)
-let Inma = Client(name: "Inma", age: 32, heigh: 1.60)
-let Rosa =  Client(name: "Rosa", age: 28, heigh: 1.58)
-let Elena = Client(name: "Elena", age: 27, heigh: 1.65)
+// Clientes:
+let Goku = Client(name: "Goku", age: 56, heigh: 1.60)
+let Pikolo = Client(name: "Pikolo", age: 51, heigh: 1.62)
+let Vegeta = Client(name: "Vegeta", age: 33, heigh: 1.82)
+let Bulma = Client(name: "Bulma", age: 32, heigh: 1.72)
+
 
 // Test
-//
-//func testAddReservation() {
-//    let manager = HotelReservationManager()
-//    let reserva1 = try manager.addNewReservation(clientslistNew: [Antonio,Ascension], daysInHotelNew: 5, breakfastNew: false)
-//    let reserva2 = manager.addNewReservation(clientslistNew: [Tomas, Inma], daysInHotelNew: 5, breakfastNew: true)
-//
-//}
 
-// EJEMPLOS RESERVAS:
-let manager = HotelReservationManager()
-let reserva1 = try manager.addNewReservation(clientslistNew: [Antonio,Ascension], daysInHotelNew: 5, breakfastNew: false)
-let reserva2 = try manager.addNewReservation(clientslistNew: [Tomas, Inma], daysInHotelNew: 5, breakfastNew: true)
-//print("reserva 1: \(reserva1)")
-
-// EJEMPLO ERRORES RESERVA:
-
-// Error id igual: se hace en test
-
-// Error crear reserva con igual cliente, lanza error "ReservationError.reserved":
-do {
-    let reserva4 = try HotelReservationManager().addNewReservation(clientslistNew: [Antonio, Rosa, Elena], daysInHotelNew: 3, breakfastNew: false)
-//    print(reserva4)
-} catch let error as ReservationError {
-    print("Error: \(error.localizedDescription)")
-} catch {
-    print("Otro error: \(error.localizedDescription)")
+func testAddReservation() {
+    let clients = [Goku, Pikolo]
+    let clients2 = [Vegeta, Bulma]
+    let clients3 = [Goku, Bulma]
+    let manager = HotelReservationManager()
+    // Nuevas reservas
+    do {
+        let reserva1 = try manager.addNewReservation(clientslistNew: clients, daysInHotelNew: 5, breakfastNew: false)
+        assert(manager.AllResevations().count == 1)
+        assert(reserva1.id == 1)
+        assert(reserva1.clientslist == clients)
+    } catch {
+        assertionFailure("Ojo! Debería haber entrado en el do. No espero error.")
+    }
+    
+    do {
+        let reserva2 = try manager.addNewReservation(clientslistNew: clients2, daysInHotelNew: 5, breakfastNew: true)
+        assert(manager.AllResevations().count == 2)
+        assert(reserva2.id == 2)
+    } catch {
+        assertionFailure("Ojo! Debería haber entrado en el do. No espero error.")
+    }
+    
+    // Reserva con cliente duplicado
+    do {
+        let reservaSameClient = try manager.addNewReservation(clientslistNew: clients3, daysInHotelNew: 3, breakfastNew: false)
+        assert(manager.AllResevations().count == 2)
+        print("Ojo! Debería haber entrado en el catch. Se esperaba error.")
+    } catch {
+        let exception = error as? ReservationError
+        assert(exception == ReservationError.reserved)
+        print("Es correcto que ocurra la excepción.")
+    }
 }
 
-let reserva3 = try manager.addNewReservation(clientslistNew: [Rosa, Elena], daysInHotelNew: 3, breakfastNew: false)
-//print(reserva3)
+func testCancelReservation() {
+    let clients3 = [Goku, Bulma]
+    let hotelManager = HotelReservationManager()
+    do {
+        let reserva = try hotelManager.addNewReservation(clientslistNew: clients3, daysInHotelNew: 5, breakfastNew: false)
+    } catch {
+        assertionFailure("No se espera ningún error")
+    }
+    // Cancelando reserva existente
+    do {
+        let cancelacion = try hotelManager.cancelReservation(idRemove: 1)
+        assert(hotelManager.AllResevations().count == 0)
+    } catch {
+        assertionFailure("Ojo! Debería haber entrado en el do. No espero error.")
+    }
+    // Cancelando reserva no existente
+    do {
+        let cancelacion = try hotelManager.cancelReservation(idRemove: 4)
+        assertionFailure("Ojo! Debería haber entrado en el catch. Se espera error.")
+        
+    } catch {
+        let excepcion = error as? ReservationError
+        assert(excepcion == ReservationError.notReserved)
+    }
+}
 
-// EJEMPLO VER RESERVAS CON EL MÉTODO ALLRESERVATIONS:
-let allReservations = manager.AllResevations()
-//print(allReservations)
+func testReservationPrice() {
+    let clients = [Goku, Pikolo]
+    let clients2 = [Vegeta, Bulma]
+    let hotelManager = HotelReservationManager()
+    // Dos reservas iguales a excepto el nombre de los clientes para comprobar que el precio es el mismo
+    do {
+        let reserva1 = try hotelManager.addNewReservation(clientslistNew: clients, daysInHotelNew: 5, breakfastNew: false)
+        let reserva2 = try hotelManager.addNewReservation(clientslistNew: clients2, daysInHotelNew: 5, breakfastNew: false)
+        assert(reserva1.price == reserva2.price)
+        print("El precio de la reserva 1 es \(reserva1.price) siendo igual al precio de la reserva 2 que es \(reserva2.price)." )
+    } catch {
+        assertionFailure("No se espera ningún error")
+    }  
+}
 
-
-// Cancelando la RESERVA 2:
-
-let cancelacion2 = try manager.cancelReservation(idRemove: 2)
-
-
-// Comprobando que la reserva 2 se ha borrado:
-
-let todasReservas = manager.AllResevations()
-
-// CANCELANDO LA RESERVA 4: Ha de dar error
-
-let cancelacion1 = try HotelReservationManager().cancelReservation(idRemove: 4)
+print("----Test Add Reservation ----")
+testAddReservation()
+print("----Test Cancel Reservation ----")
+testCancelReservation()
+print("----Test Reservation Price----")
+testReservationPrice()
