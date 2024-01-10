@@ -22,22 +22,20 @@ enum ReservationError: LocalizedError {
     
     var errorDescription: String? {
         switch self {
-        case .sameId:
-            return "Se encontró reserva con el mismo Id"
-        case .reserved:
-            return "El cliente ya tiene una reserva"
-        case .notReserved:
-            return "No se ha encontrado la reserva"
+            case .sameId:
+                return "Se encontró reserva con el mismo Id"
+            case .reserved:
+                return "El cliente ya tiene una reserva"
+            case .notReserved:
+                return "No se ha encontrado la reserva"
         }
     }
 }
 
 class HotelReservationManager {
-    
     private var reservationList: [Reservation] = []
     let hotelName: String
     let unitPrice: Double
-    
     
     // Constructor con parametros por defecto:
    init(hotelName: String = "Hotel Luchadores", unitPrice: Double = 20.00) {
@@ -57,12 +55,12 @@ class HotelReservationManager {
             }
         }
         
+        
         // Verificar que no se duplica un cliente si ya tiene hecha una reserva:
-        for newclient in clientslistNew {
-            for reservation in reservationList {
-                if reservation.clientslist.contains(newclient) {
-                    throw ReservationError.reserved
-                }
+        
+        for newClient in clientslistNew {
+            if reservationList.contains(where: { $0.clientslist.contains(where: { $0.name == newClient.name }) }) {
+                throw ReservationError.reserved
             }
         }
         
@@ -76,7 +74,6 @@ class HotelReservationManager {
         let newReservation = Reservation(id: newId, hotelName: hotelName, clientslist: clientslistNew, daysInHotel: daysInHotelNew, price: priceNew, breakfast: breakfastNew)
         
         reservationList.append(newReservation)
-//        self.reservationList = reservationList
 
         print("Se ha realizado la reserva nº \(newReservation.id) para \(clientslistNew.count) clientes y \(daysInHotelNew) días, por un importe total de \(priceNew) € en el \(hotelName).")
         
@@ -89,7 +86,6 @@ class HotelReservationManager {
             throw ReservationError.notReserved
           }
         reservationList.remove(at: deleteReservation)
-//    7self.reservationList = reservationList
         print("La reserva nº \(idRemove) se ha cancelado")
       }
 
@@ -116,36 +112,46 @@ class HotelReservationManager {
 // EJEMPLOS CLIENTES:
 let Antonio = Client(name: "Antonio", age: 56, heigh: 1.60)
 let Ascension = Client(name: "Ascension", age: 51, heigh: 1.62)
-
 let Tomas = Client(name: "Tomás", age: 33, heigh: 1.82)
 let Inma = Client(name: "Inma", age: 32, heigh: 1.60)
-
 let Rosa =  Client(name: "Rosa", age: 28, heigh: 1.58)
 let Elena = Client(name: "Elena", age: 27, heigh: 1.65)
 
-// EJEMPLOS RESERVA:
+// Test
+//
+//func testAddReservation() {
+//    let manager = HotelReservationManager()
+//    let reserva1 = try manager.addNewReservation(clientslistNew: [Antonio,Ascension], daysInHotelNew: 5, breakfastNew: false)
+//    let reserva2 = manager.addNewReservation(clientslistNew: [Tomas, Inma], daysInHotelNew: 5, breakfastNew: true)
+//
+//}
 
+// EJEMPLOS RESERVAS:
 let manager = HotelReservationManager()
-
 let reserva1 = try manager.addNewReservation(clientslistNew: [Antonio,Ascension], daysInHotelNew: 5, breakfastNew: false)
-
 let reserva2 = try manager.addNewReservation(clientslistNew: [Tomas, Inma], daysInHotelNew: 5, breakfastNew: true)
+//print("reserva 1: \(reserva1)")
 
 // EJEMPLO ERRORES RESERVA:
 
-// Error id igual no puedo comprobar porque siempre suma y no da la opcion de meter reserva con id. Hacer con test
-/*
+// Error id igual: se hace en test
+
 // Error crear reserva con igual cliente, lanza error "ReservationError.reserved":
-let reserva3 = try? HotelReservationManager().addNewReservation(clientslistNew: [Rosa, Elena, Antonio], daysInHotelNew: 3, breakfastNew: false)
-print(reserva3 ?? ReservationError.self)
-*/
+do {
+    let reserva4 = try HotelReservationManager().addNewReservation(clientslistNew: [Antonio, Rosa, Elena], daysInHotelNew: 3, breakfastNew: false)
+//    print(reserva4)
+} catch let error as ReservationError {
+    print("Error: \(error.localizedDescription)")
+} catch {
+    print("Otro error: \(error.localizedDescription)")
+}
 
 let reserva3 = try manager.addNewReservation(clientslistNew: [Rosa, Elena], daysInHotelNew: 3, breakfastNew: false)
-print(reserva3 ?? ReservationError.self)
+//print(reserva3)
 
 // EJEMPLO VER RESERVAS CON EL MÉTODO ALLRESERVATIONS:
 let allReservations = manager.AllResevations()
-//print(manager.reservationList)
+//print(allReservations)
 
 
 // Cancelando la RESERVA 2:
@@ -160,5 +166,3 @@ let todasReservas = manager.AllResevations()
 // CANCELANDO LA RESERVA 4: Ha de dar error
 
 let cancelacion1 = try HotelReservationManager().cancelReservation(idRemove: 4)
-// Hay que modificar porque sale repetido el mensaje de que no existe, el print pero no arroja error. Hay que quitar la repetición.
-
